@@ -1,8 +1,12 @@
 return { -- Highlight, edit, and navigate code
   'nvim-treesitter/nvim-treesitter',
+  lazy = false,
+  event = 'BufRead',
+  branch = 'main',
   build = ':TSUpdate',
-  main = 'nvim-treesitter.configs', -- Sets main module to use for opts
+  --main = 'nvim-treesitter.configs', -- Sets main module to use for opts
   -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
+  ---@class TSConfig
   opts = {
     ensure_installed = {
       'lua',
@@ -43,6 +47,25 @@ return { -- Highlight, edit, and navigate code
     },
     indent = { enable = true, disable = { 'ruby' } },
   },
+  config = function(_, opts)
+    -- install parsers from custom opts.ensure_installed
+    if opts.ensure_installed and #opts.ensure_installed > 0 then
+      require('nvim-treesitter').install(opts.ensure_installed)
+      -- register and start parsers for filetypes
+      for _, parser in ipairs(opts.ensure_installed) do
+        local filetypes = parser -- In this case, parser is the filetype/language name
+        vim.treesitter.language.register(parser, filetypes)
+
+        vim.api.nvim_create_autocmd({ 'FileType' }, {
+          pattern = filetypes,
+          callback = function(event)
+            vim.treesitter.start(event.buf, parser)
+          end,
+        })
+      end
+    end
+  end,
+
   -- There are additional nvim-treesitter modules that you can use to interact
   -- with nvim-treesitter. You should go explore a few and see what interests you:
   --
