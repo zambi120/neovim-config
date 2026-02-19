@@ -179,6 +179,7 @@ return {
       },
       -- New additions
       gopls = {},
+      templ = {},
     }
 
     -- Ensure the servers and tools above are installed
