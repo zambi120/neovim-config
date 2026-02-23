@@ -178,7 +178,9 @@ return {
         },
       },
       -- New additions
-      gopls = {},
+      gopls = {
+        filetypes = { 'go', 'tmpl' },
+      },
       templ = {},
     }
 
